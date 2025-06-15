@@ -14,6 +14,8 @@ struct MovieListView: View {
         NavigationStack {
             ZStack(alignment: .top) {
                 if !viewModel.movies.isEmpty {
+                    
+                    // MARK: - Background Poster Image
                     if let url = viewModel.poster(viewModel.movies[viewModel.currentIndex].poster_path) {
                         AsyncImage(url: url)
                         { image in
@@ -26,9 +28,11 @@ struct MovieListView: View {
                         } placeholder: {
                             ProgressView()
                                 .frame(height: 600)
-                                       .ignoresSafeArea()
+                                .ignoresSafeArea()
                         }
                     }
+                    
+                    // MARK: - Overlay Gradient
                     LinearGradient(
                         gradient: Gradient(colors: [.clear, .black.opacity(0.3), .black]),
                         startPoint: .top,
@@ -36,9 +40,11 @@ struct MovieListView: View {
                     )
                     .ignoresSafeArea()
                     
+                    // MARK: - Foreground Content
                     VStack(spacing: 20) {
                         Spacer()
                         
+                        // MARK: - Movie Info Section
                         VStack(spacing: 12) {
                             Text("NEW • MOVIE")
                                 .foregroundColor(.white.opacity(0.7))
@@ -53,18 +59,18 @@ struct MovieListView: View {
                                 .multilineTextAlignment(.center)
                                 .animation(.easeInOut(duration: 0.3), value: viewModel.currentIndex)
                             
-                                Text("Release: \(viewModel.movies[viewModel.currentIndex].release_date)")
+                            Text("Release: \(viewModel.movies[viewModel.currentIndex].release_date)")
                                 .foregroundColor(.white.opacity(0.9))
                                 .font(.callout)
                                 .animation(.easeInOut(duration: 0.3), value: viewModel.currentIndex)
                             
                             StarRatingView(rating: viewModel.movies[viewModel.currentIndex].vote_average / 2)
                                 .animation(.easeInOut(duration: 0.3), value: viewModel.currentIndex)
-
                         }
                         
                         Spacer().frame(height: 20)
                         
+                        // MARK: - Horizontal Scrollable Carousel
                         ScrollViewReader { proxy in
                             ScrollView(.horizontal, showsIndicators: false) {
                                 LazyHStack(spacing: viewModel.spacing) {
@@ -78,9 +84,8 @@ struct MovieListView: View {
                                             let scale = distance < threshold ? 1.15 : max(0.85, 1.0 - (distance - threshold) / (viewModel.pageWidth * 1.5))
                                             let opacity = distance < threshold ? 1.0 : max(0.6, 1.0 - (distance - threshold) / (viewModel.pageWidth * 2))
                                             let isCenterItem = distance < threshold
-                                            NavigationLink(value: movie) {
-                                                
                                             
+                                            NavigationLink(value: movie) {
                                                 MovieCardView(
                                                     movie: movie,
                                                     index: index,
@@ -136,4 +141,3 @@ struct MovieListView: View {
 #Preview {
     MovieListView()
 }
-

@@ -8,18 +8,20 @@
 import SwiftUI
 
 struct FavoritesView: View {
+    // MARK: - Properties
     @State private var favorites: [FavoriteMovie] = []
     @State private var currentIndex: Int = 0
     @State private var showAllFavorites = false
     @State private var selectedMovie: Movie?
 
     var body: some View {
+        // MARK: - Main View
         NavigationStack {
             ZStack {
                 Color.black.ignoresSafeArea()
 
                 if favorites.isEmpty {
-                    // MARK: - Standard Empty State UI
+                    // MARK: - Empty State
                     VStack(spacing: 20) {
                         Image(systemName: "heart.slash.fill")
                             .resizable()
@@ -57,6 +59,8 @@ struct FavoritesView: View {
             .toolbarBackground(Color.black, for: .navigationBar)
             .toolbarBackground(.visible, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)
+
+            // MARK: - Lifecycle
             .onAppear {
                 favorites = CoreDataManager.shared.getFavorites()
             }
@@ -71,7 +75,6 @@ struct FavoritesView: View {
                     }
                 }
             }
-            // Add navigation destination for Movie
             .navigationDestination(item: $selectedMovie) { movie in
                 let secondVM = MovieDetailViewModel(movie: movie)
                 MovieDetailView(viewModel: secondVM)
@@ -107,7 +110,7 @@ struct FavoritesView: View {
         .offset(y: -80)
     }
 
-    // MARK: - Posters
+    // MARK: - Poster Stack with Swipe
     private var posterStack: some View {
         ForEach(favorites.indices, id: \.self) { index in
             let offset = CGFloat(index - currentIndex)
@@ -144,7 +147,7 @@ struct FavoritesView: View {
         )
     }
 
-    // MARK: - Arrows
+    // MARK: - Arrow Buttons
     private var arrowButtons: some View {
         HStack {
             if currentIndex > 0 {
@@ -185,7 +188,7 @@ struct FavoritesView: View {
         .padding(.top, 210)
     }
 
-    // MARK: - View All & Title Overlay
+    // MARK: - View All Overlay
     private var viewAllOverlay: some View {
         VStack {
             Spacer()
@@ -212,14 +215,13 @@ struct FavoritesView: View {
                             RoundedRectangle(cornerRadius: 12)
                                 .stroke(Color.white.opacity(0.8), lineWidth: 1)
                         )
-
                 }
                 .offset(y: 10)
             }
         }
     }
 
-    // MARK: - Poster View
+    // MARK: - Poster Image View
     @ViewBuilder
     private func poster(for movie: FavoriteMovie, width: CGFloat, height: CGFloat) -> some View {
         if let path = movie.poster_path,
@@ -241,8 +243,8 @@ struct FavoritesView: View {
                 .cornerRadius(10)
         }
     }
-    
-    // MARK: - Helper function to convert FavoriteMovie to Movie
+
+    // MARK: - Helper: Convert FavoriteMovie to Movie
     private func convertToMovie(from favorite: FavoriteMovie) -> Movie {
         return Movie(
             id: Int(favorite.id),

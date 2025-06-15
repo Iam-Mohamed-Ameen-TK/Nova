@@ -15,7 +15,9 @@ struct SearchView: View {
     var body: some View {
         NavigationStack {
             VStack {
-                HStack {                    
+                
+                // MARK: - Search Bar
+                HStack {
                     ZStack(alignment: .leading) {
                         if searchText.isEmpty {
                             Text("Search")
@@ -39,13 +41,13 @@ struct SearchView: View {
                         RoundedRectangle(cornerRadius: 10)
                             .stroke(Color.white.opacity(0.3), lineWidth: 1)
                     )
-
-                    
                 }
                 .padding(.top, 10)
                 .padding(.horizontal)
                 
+                // MARK: - Conditional Movie Lists
                 if searchText.isEmpty {
+                    // MARK: - Top Searches
                     VStack(alignment: .leading) {
                         Text("Top Search")
                             .fontWeight(.heavy)
@@ -61,6 +63,7 @@ struct SearchView: View {
                         .background(Color.black)
                     }
                 } else {
+                    // MARK: - Search Results Grid
                     VStack(alignment: .leading) {
                         Text("Movies & TV")
                             .fontWeight(.heavy)
@@ -73,7 +76,6 @@ struct SearchView: View {
                                 ForEach(viewModel.search, id: \.id) { movie in
                                     if let url = viewModel.poster(movie.poster_path) {
                                         SearchPosterView(movie: movie, url: url)
-                                            
                                     }
                                 }
                             }
@@ -94,6 +96,7 @@ struct SearchView: View {
     }
 }
 
+// MARK: - Preview
 struct SearchView_Previews: PreviewProvider {
     static var previews: some View {
         SearchView()

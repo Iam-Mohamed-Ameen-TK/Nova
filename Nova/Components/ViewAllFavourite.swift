@@ -11,6 +11,7 @@ struct AllFavoritesSheet: View {
     @State private var localFavorites: [FavoriteMovie]
     @Environment(\.dismiss) private var dismiss
 
+    // Initializes localFavorites with passed-in data
     init(favorites: [FavoriteMovie]) {
         self._localFavorites = State(initialValue: favorites)
     }
@@ -19,6 +20,7 @@ struct AllFavoritesSheet: View {
         NavigationStack {
             Group {
                 if localFavorites.isEmpty {
+                    // Placeholder view when there are no favorite movies
                     VStack(spacing: 20) {
                         Image(systemName: "star.slash")
                             .resizable()
@@ -65,6 +67,7 @@ struct AllFavoritesSheet: View {
                             .listRowSeparator(.hidden)
                             .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                                 Button(role: .destructive) {
+                                    // Deletes the selected movie from Core Data and local list
                                     if let index = localFavorites.firstIndex(of: movie) {
                                         deleteMovie(at: IndexSet(integer: index))
                                     }
@@ -96,6 +99,7 @@ struct AllFavoritesSheet: View {
         }
     }
 
+    // Removes movie from Core Data and updates localFavorites
     private func deleteMovie(at offsets: IndexSet) {
         for index in offsets {
             let movie = localFavorites[index]
