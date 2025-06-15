@@ -16,7 +16,7 @@ struct NovaApp: App {
         WindowGroup {
             ZStack {
                 if showSplash {
-                    MainTabView()
+                    FavoritesView()
                         .transition(.opacity)
                 } else {
                     MainTabView()
