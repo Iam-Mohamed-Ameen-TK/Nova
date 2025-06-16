@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SDWebImageSwiftUI
 
 struct SearchPosterView: View {
     let movie: Movie
@@ -13,7 +14,7 @@ struct SearchPosterView: View {
 
     var body: some View {
         NavigationLink(value: movie) {
-            AsyncImage(url: url) { image in
+            WebImage(url: url) { image in
                 image
                     .resizable()
                     .scaledToFill()

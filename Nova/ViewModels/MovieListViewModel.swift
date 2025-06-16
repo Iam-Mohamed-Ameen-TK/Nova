@@ -25,7 +25,7 @@ class MovieListViewModel: ObservableObject {
     }
     
     func colorForMovie(at index: Int) -> Color {
-        let colors: [Color] = [.red, .blue, .green, .orange, .purple, .pink]
+        let colors: [Color] = [.gray, .gray, .gray, .gray, .gray, .gray]
         return colors[index % colors.count]
     }
     

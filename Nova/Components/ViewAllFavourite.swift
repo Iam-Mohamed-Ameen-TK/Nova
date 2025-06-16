@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SDWebImageSwiftUI
 
 struct AllFavoritesSheet: View {
     @State private var localFavorites: [FavoriteMovie]
@@ -37,7 +38,7 @@ struct AllFavoritesSheet: View {
                     List {
                         ForEach(localFavorites, id: \.self) { movie in
                             HStack(spacing: 20) {
-                                AsyncImage(url: URL(string: "https://image.tmdb.org/t/p/w200\(movie.poster_path ?? "")")) { image in
+                                WebImage(url: URL(string: "https://image.tmdb.org/t/p/w200\(movie.poster_path ?? "")")) { image in
                                     image
                                         .resizable()
                                         .scaledToFill()

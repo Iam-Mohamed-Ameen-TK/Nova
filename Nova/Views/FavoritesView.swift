@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SDWebImageSwiftUI
 
 struct FavoritesView: View {
     // MARK: - Properties
@@ -226,7 +227,7 @@ struct FavoritesView: View {
     private func poster(for movie: FavoriteMovie, width: CGFloat, height: CGFloat) -> some View {
         if let path = movie.poster_path,
            let url = URL(string: "https://image.tmdb.org/t/p/w500\(path)") {
-            AsyncImage(url: url) { image in
+            WebImage(url: url) { image in
                 image
                     .resizable()
                     .scaledToFill()

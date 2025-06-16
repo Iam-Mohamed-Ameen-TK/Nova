@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SDWebImageSwiftUI
 
 struct SearchList: View {
     
@@ -17,7 +18,7 @@ struct SearchList: View {
             NavigationLink(value: movie) {
                 HStack(spacing: 10) {
                     if let url = viewModel.poster(movie.poster_path) {
-                        AsyncImage(url: url)
+                        WebImage(url: url)
                         { image in
                             image
                                 .resizable()

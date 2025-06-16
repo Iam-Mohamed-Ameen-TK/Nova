@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SDWebImageSwiftUI
 
 struct MovieDetailView: View {
     @ObservedObject var viewModel: MovieDetailViewModel
@@ -30,7 +31,7 @@ struct MovieDetailView: View {
     @ViewBuilder
     private var posterBackground: some View {
         if let url = URL(string: "https://image.tmdb.org/t/p/w500\(viewModel.movie.poster_path)") {
-            AsyncImage(url: url) { image in
+            WebImage(url: url) { image in
                 image
                     .resizable()
                     .scaledToFill()

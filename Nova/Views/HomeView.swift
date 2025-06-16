@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SDWebImageSwiftUI
 
 struct MovieListView: View {
     @StateObject private var viewModel = MovieListViewModel()
@@ -17,7 +18,7 @@ struct MovieListView: View {
                     
                     // MARK: - Background Poster Image
                     if let url = viewModel.poster(viewModel.movies[viewModel.currentIndex].poster_path) {
-                        AsyncImage(url: url)
+                        WebImage(url: url)
                         { image in
                             image
                                 .resizable()
