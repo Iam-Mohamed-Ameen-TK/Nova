@@ -53,6 +53,7 @@ struct FavoritesView: View {
 
                         Spacer()
                     }
+                    .padding(.top, UIApplication.shared.windows.first?.safeAreaInsets.top ?? 44)
                     .padding()
                 }
 
@@ -71,12 +72,14 @@ struct FavoritesView: View {
                 }
                 .hidden()
             }
-            .navigationBarTitle("Favorites", displayMode: .inline)
             .onAppear {
                 favorites = CoreDataManager.shared.getFavorites()
+               
             }
             .sheet(isPresented: $showAllFavorites) {
-                AllFavoritesSheet(favorites: favorites)
+                AllFavoritesSheet(favorites: favorites, action: {
+                    favorites = CoreDataManager.shared.getFavorites()
+                })
             }
             .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
                 favorites = CoreDataManager.shared.getFavorites()

@@ -11,10 +11,12 @@ import SDWebImageSwiftUI
 struct AllFavoritesSheet: View {
     @State private var localFavorites: [FavoriteMovie]
     @Environment(\.presentationMode) private var presentationMode
+    var action: (() -> Void)?
 
     // Initializes localFavorites with passed-in data
-    init(favorites: [FavoriteMovie]) {
+    init(favorites: [FavoriteMovie], action: (() -> Void)? = nil) {
         self._localFavorites = State(initialValue: favorites)
+        self.action = action
     }
 
     var body: some View {
@@ -99,6 +101,7 @@ struct AllFavoritesSheet: View {
             }
         }
     }
+    
 
     // Removes movie from Core Data and updates localFavorites
     private func deleteMovie(at offsets: IndexSet) {
@@ -108,5 +111,6 @@ struct AllFavoritesSheet: View {
             CoreDataManager.shared.removeFromFavorites(id: id)
         }
         localFavorites.remove(atOffsets: offsets)
+        action?()
     }
 }
