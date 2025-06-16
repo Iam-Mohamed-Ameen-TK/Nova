@@ -10,6 +10,7 @@ import SDWebImageSwiftUI
 
 struct MovieListView: View {
     @StateObject private var viewModel = MovieListViewModel()
+    @State private var shouldScrollToCurrentIndex = false
     
     var body: some View {
         NavigationView {
@@ -23,7 +24,7 @@ struct MovieListView: View {
                             image
                                 .resizable()
                                 .scaledToFill()
-                                .animation(.easeInOut(duration: 0.5))
+                                .animation(.spring(response: 0.8, dampingFraction: 0.9, blendDuration: 0.3), value: viewModel.currentIndex)
                                 .frame(height: 600)
                                 .ignoresSafeArea()
                         } placeholder: {
@@ -58,15 +59,15 @@ struct MovieListView: View {
                                 .font(.largeTitle)
                                 .fontWeight(.bold)
                                 .multilineTextAlignment(.center)
-                                .animation(.easeInOut(duration: 0.3))
+                                .animation(.spring(response: 0.6, dampingFraction: 0.8, blendDuration: 0.2), value: viewModel.currentIndex)
                             
                             Text("Release: \(viewModel.movies[viewModel.currentIndex].release_date)")
                                 .foregroundColor(.white.opacity(0.9))
                                 .font(.callout)
-                                .animation(.easeInOut(duration: 0.3))
+                                .animation(.spring(response: 0.6, dampingFraction: 0.8, blendDuration: 0.2), value: viewModel.currentIndex)
                             
                             StarRatingView(rating: viewModel.movies[viewModel.currentIndex].vote_average / 2)
-                                .animation(.easeInOut(duration: 0.3))
+                                .animation(.spring(response: 0.6, dampingFraction: 0.8, blendDuration: 0.2), value: viewModel.currentIndex)
                         }
                         
                         Spacer().frame(height: 20)
@@ -101,9 +102,17 @@ struct MovieListView: View {
                                                 )
                                             }
                                             .onTapGesture {
-                                                withAnimation(.easeInOut(duration: 0.6)) {
-                                                    viewModel.currentIndex = index
+                                                // Update current index when tapped
+                                                viewModel.currentIndex = index
+                                                withAnimation(.spring(response: 0.8, dampingFraction: 0.75, blendDuration: 0.3)) {
                                                     proxy.scrollTo(movie.id, anchor: .center)
+                                                }
+                                            }
+                                            .onChange(of: scale) { newScale in
+                                                if newScale > 1.1 && viewModel.currentIndex != index {
+                                                    DispatchQueue.main.async {
+                                                        viewModel.currentIndex = index
+                                                    }
                                                 }
                                             }
                                         }
@@ -115,8 +124,23 @@ struct MovieListView: View {
                             }
                             .onAppear {
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                                    withAnimation(.easeInOut(duration: 0.5)) {
+                                    withAnimation(.spring(response: 0.9, dampingFraction: 0.85, blendDuration: 0.2)) {
                                         proxy.scrollTo(viewModel.movies[viewModel.currentIndex].id, anchor: .center)
+                                    }
+                                }
+                            }
+                            .onChange(of: viewModel.currentIndex) { newIndex in
+                                withAnimation(.spring(response: 0.7, dampingFraction: 0.8, blendDuration: 0.2)) {
+                                    proxy.scrollTo(viewModel.movies[newIndex].id, anchor: .center)
+                                }
+                            }
+                            .onChange(of: shouldScrollToCurrentIndex) { shouldScroll in
+                                if shouldScroll {
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                                        withAnimation(.spring(response: 0.8, dampingFraction: 0.85, blendDuration: 0.3)) {
+                                            proxy.scrollTo(viewModel.movies[viewModel.currentIndex].id, anchor: .center)
+                                        }
+                                        shouldScrollToCurrentIndex = false
                                     }
                                 }
                             }
@@ -127,7 +151,12 @@ struct MovieListView: View {
                 }
             }
             .navigationBarHidden(true)
+            .onAppear {
+                // Trigger scroll restoration when view appears
+                shouldScrollToCurrentIndex = true
+            }
         }
+        .navigationViewStyle(StackNavigationViewStyle()) // Force single view on iPad
     }
 }
 
