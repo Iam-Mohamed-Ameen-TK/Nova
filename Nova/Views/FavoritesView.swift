@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SDWebImageSwiftUI
 
 struct FavoritesView: View {
     // MARK: - Properties
@@ -13,10 +14,11 @@ struct FavoritesView: View {
     @State private var currentIndex: Int = 0
     @State private var showAllFavorites = false
     @State private var selectedMovie: Movie?
+    @State private var isShowingDetail = false
 
     var body: some View {
         // MARK: - Main View
-        NavigationStack {
+        NavigationView {
             ZStack {
                 Color.black.ignoresSafeArea()
 
@@ -51,33 +53,39 @@ struct FavoritesView: View {
 
                         Spacer()
                     }
+                    .padding(.top, UIApplication.shared.windows.first?.safeAreaInsets.top ?? 44)
                     .padding()
                 }
-            }
-            .navigationTitle("Favorites")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbarBackground(Color.black, for: .navigationBar)
-            .toolbarBackground(.visible, for: .navigationBar)
-            .toolbarColorScheme(.dark, for: .navigationBar)
 
-            // MARK: - Lifecycle
+                // NavigationLink fallback
+                NavigationLink(
+                    destination: Group {
+                        if let movie = selectedMovie {
+                            MovieDetailView(viewModel: MovieDetailViewModel(movie: movie))
+                        } else {
+                            EmptyView()
+                        }
+                    },
+                    isActive: $isShowingDetail
+                ) {
+                    EmptyView()
+                }
+                .hidden()
+            }
             .onAppear {
                 favorites = CoreDataManager.shared.getFavorites()
+               
             }
             .sheet(isPresented: $showAllFavorites) {
-                AllFavoritesSheet(favorites: favorites)
-            }
-            .onChange(of: showAllFavorites) { isShown in
-                if !isShown {
+                AllFavoritesSheet(favorites: favorites, action: {
                     favorites = CoreDataManager.shared.getFavorites()
-                    if currentIndex >= favorites.count {
-                        currentIndex = max(0, favorites.count - 1)
-                    }
-                }
+                })
             }
-            .navigationDestination(item: $selectedMovie) { movie in
-                let secondVM = MovieDetailViewModel(movie: movie)
-                MovieDetailView(viewModel: secondVM)
+            .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
+                favorites = CoreDataManager.shared.getFavorites()
+                if currentIndex >= favorites.count {
+                    currentIndex = max(0, favorites.count - 1)
+                }
             }
         }
     }
@@ -130,6 +138,7 @@ struct FavoritesView: View {
                     if isCurrent {
                         let movie = convertToMovie(from: favorites[index])
                         selectedMovie = movie
+                        isShowingDetail = true
                     }
                 }
         }
@@ -226,7 +235,7 @@ struct FavoritesView: View {
     private func poster(for movie: FavoriteMovie, width: CGFloat, height: CGFloat) -> some View {
         if let path = movie.poster_path,
            let url = URL(string: "https://image.tmdb.org/t/p/w500\(path)") {
-            AsyncImage(url: url) { image in
+            WebImage(url: url) { image in
                 image
                     .resizable()
                     .scaledToFill()

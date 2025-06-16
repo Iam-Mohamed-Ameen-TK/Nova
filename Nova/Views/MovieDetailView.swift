@@ -6,10 +6,11 @@
 //
 
 import SwiftUI
+import SDWebImageSwiftUI
 
 struct MovieDetailView: View {
     @ObservedObject var viewModel: MovieDetailViewModel
-    @Environment(\.dismiss) private var dismiss
+    @Environment(\.presentationMode) private var presentationMode
 
     var body: some View {
         ZStack(alignment: .top) {
@@ -30,7 +31,7 @@ struct MovieDetailView: View {
     @ViewBuilder
     private var posterBackground: some View {
         if let url = URL(string: "https://image.tmdb.org/t/p/w500\(viewModel.movie.poster_path)") {
-            AsyncImage(url: url) { image in
+            WebImage(url: url) { image in
                 image
                     .resizable()
                     .scaledToFill()
@@ -98,7 +99,7 @@ struct MovieDetailView: View {
     private var topBar: some View {
         HStack {
             Button(action: {
-                dismiss()
+                self.presentationMode.wrappedValue.dismiss()
             }) {
                 Image(systemName: "xmark.circle.fill")
                     .font(.system(size: 24))

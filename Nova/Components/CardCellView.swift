@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SDWebImageSwiftUI
 
 struct MovieCardView: View {
     let movie: Movie
@@ -38,7 +39,7 @@ struct MovieCardView: View {
                     .frame(width: pageWidth, height: pageHeight)
                 
                 if let url = URL(string: "https://image.tmdb.org/t/p/w500\(movie.poster_path)") {
-                    AsyncImage(url: url)
+                    WebImage(url: url)
                     { image in
                         image
                             .resizable()
