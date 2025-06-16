@@ -10,7 +10,7 @@ import SDWebImageSwiftUI
 
 struct AllFavoritesSheet: View {
     @State private var localFavorites: [FavoriteMovie]
-    @Environment(\.dismiss) private var dismiss
+    @Environment(\.presentationMode) private var presentationMode
 
     // Initializes localFavorites with passed-in data
     init(favorites: [FavoriteMovie]) {
@@ -18,7 +18,7 @@ struct AllFavoritesSheet: View {
     }
 
     var body: some View {
-        NavigationStack {
+        NavigationView {
             Group {
                 if localFavorites.isEmpty {
                     // Placeholder view when there are no favorite movies
@@ -65,25 +65,25 @@ struct AllFavoritesSheet: View {
                             }
                             .padding(.vertical, 8)
                             .listRowBackground(Color.clear)
-                            .listRowSeparator(.hidden)
-                            .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                                Button(role: .destructive) {
-                                    // Deletes the selected movie from Core Data and local list
-                                    if let index = localFavorites.firstIndex(of: movie) {
-                                        deleteMovie(at: IndexSet(integer: index))
-                                    }
-                                } label: {
-                                    Label {
-                                        Text("Delete")
-                                    } icon: {
-                                        Image(systemName: "trash")
-                                    }
-                                }
-                            }
+                            .listStyle(PlainListStyle())
+//                            .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+//                                Button {
+//                                    // Deletes the selected movie from Core Data and local list
+//                                    if let index = localFavorites.firstIndex(of: movie) {
+//                                        deleteMovie(at: IndexSet(integer: index))
+//                                    }
+//                                } label: {
+//                                    Label {
+//                                        Text("Delete")
+//                                    } icon: {
+//                                        Image(systemName: "trash")
+//                                    }
+//                                }
+//                            }
                         }
+                        .onDelete(perform: deleteMovie)
                     }
                     .listStyle(PlainListStyle())
-                    .scrollContentBackground(.hidden)
                 }
             }
             .background(Color.black.ignoresSafeArea())
@@ -92,7 +92,7 @@ struct AllFavoritesSheet: View {
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Done") {
-                        dismiss()
+                        self.presentationMode.wrappedValue.dismiss()
                     }
                     .foregroundColor(.white)
                 }

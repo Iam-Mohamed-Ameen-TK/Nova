@@ -38,7 +38,7 @@ struct MainTabView: View {
                     Text("Favorites")
                 }
         }
-        .tint(.red)
+        .accentColor(.red)
     }
 }
 

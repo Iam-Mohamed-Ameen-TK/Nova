@@ -14,10 +14,11 @@ struct FavoritesView: View {
     @State private var currentIndex: Int = 0
     @State private var showAllFavorites = false
     @State private var selectedMovie: Movie?
+    @State private var isShowingDetail = false
 
     var body: some View {
         // MARK: - Main View
-        NavigationStack {
+        NavigationView {
             ZStack {
                 Color.black.ignoresSafeArea()
 
@@ -54,31 +55,34 @@ struct FavoritesView: View {
                     }
                     .padding()
                 }
-            }
-            .navigationTitle("Favorites")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbarBackground(Color.black, for: .navigationBar)
-            .toolbarBackground(.visible, for: .navigationBar)
-            .toolbarColorScheme(.dark, for: .navigationBar)
 
-            // MARK: - Lifecycle
+                // NavigationLink fallback
+                NavigationLink(
+                    destination: Group {
+                        if let movie = selectedMovie {
+                            MovieDetailView(viewModel: MovieDetailViewModel(movie: movie))
+                        } else {
+                            EmptyView()
+                        }
+                    },
+                    isActive: $isShowingDetail
+                ) {
+                    EmptyView()
+                }
+                .hidden()
+            }
+            .navigationBarTitle("Favorites", displayMode: .inline)
             .onAppear {
                 favorites = CoreDataManager.shared.getFavorites()
             }
             .sheet(isPresented: $showAllFavorites) {
                 AllFavoritesSheet(favorites: favorites)
             }
-            .onChange(of: showAllFavorites) { isShown in
-                if !isShown {
-                    favorites = CoreDataManager.shared.getFavorites()
-                    if currentIndex >= favorites.count {
-                        currentIndex = max(0, favorites.count - 1)
-                    }
+            .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
+                favorites = CoreDataManager.shared.getFavorites()
+                if currentIndex >= favorites.count {
+                    currentIndex = max(0, favorites.count - 1)
                 }
-            }
-            .navigationDestination(item: $selectedMovie) { movie in
-                let secondVM = MovieDetailViewModel(movie: movie)
-                MovieDetailView(viewModel: secondVM)
             }
         }
     }
@@ -131,6 +135,7 @@ struct FavoritesView: View {
                     if isCurrent {
                         let movie = convertToMovie(from: favorites[index])
                         selectedMovie = movie
+                        isShowingDetail = true
                     }
                 }
         }

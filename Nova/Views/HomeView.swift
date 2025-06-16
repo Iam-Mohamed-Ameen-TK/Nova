@@ -12,7 +12,7 @@ struct MovieListView: View {
     @StateObject private var viewModel = MovieListViewModel()
     
     var body: some View {
-        NavigationStack {
+        NavigationView {
             ZStack(alignment: .top) {
                 if !viewModel.movies.isEmpty {
                     
@@ -23,7 +23,7 @@ struct MovieListView: View {
                             image
                                 .resizable()
                                 .scaledToFill()
-                                .animation(.easeInOut(duration: 0.5), value: viewModel.currentIndex)
+                                .animation(.easeInOut(duration: 0.5))
                                 .frame(height: 600)
                                 .ignoresSafeArea()
                         } placeholder: {
@@ -58,15 +58,15 @@ struct MovieListView: View {
                                 .font(.largeTitle)
                                 .fontWeight(.bold)
                                 .multilineTextAlignment(.center)
-                                .animation(.easeInOut(duration: 0.3), value: viewModel.currentIndex)
+                                .animation(.easeInOut(duration: 0.3))
                             
                             Text("Release: \(viewModel.movies[viewModel.currentIndex].release_date)")
                                 .foregroundColor(.white.opacity(0.9))
                                 .font(.callout)
-                                .animation(.easeInOut(duration: 0.3), value: viewModel.currentIndex)
+                                .animation(.easeInOut(duration: 0.3))
                             
                             StarRatingView(rating: viewModel.movies[viewModel.currentIndex].vote_average / 2)
-                                .animation(.easeInOut(duration: 0.3), value: viewModel.currentIndex)
+                                .animation(.easeInOut(duration: 0.3))
                         }
                         
                         Spacer().frame(height: 20)
@@ -86,7 +86,9 @@ struct MovieListView: View {
                                             let opacity = distance < threshold ? 1.0 : max(0.6, 1.0 - (distance - threshold) / (viewModel.pageWidth * 2))
                                             let isCenterItem = distance < threshold
                                             
-                                            NavigationLink(value: movie) {
+                                            NavigationLink(
+                                                destination: MovieDetailView(viewModel: MovieDetailViewModel(movie: movie))
+                                            ) {
                                                 MovieCardView(
                                                     movie: movie,
                                                     index: index,
@@ -104,13 +106,6 @@ struct MovieListView: View {
                                                     proxy.scrollTo(movie.id, anchor: .center)
                                                 }
                                             }
-                                            .onChange(of: scale) { _, newScale in
-                                                if newScale > 1.1 && viewModel.currentIndex != index {
-                                                    DispatchQueue.main.async {
-                                                        viewModel.currentIndex = index
-                                                    }
-                                                }
-                                            }
                                         }
                                         .frame(width: viewModel.pageWidth, height: viewModel.pageHeight + 60)
                                         .id(movie.id)
@@ -125,20 +120,21 @@ struct MovieListView: View {
                                     }
                                 }
                             }
-                            .navigationDestination(for: Movie.self) { movie in
-                                let secondVM = MovieDetailViewModel(movie: movie)
-                                MovieDetailView(viewModel: secondVM)
-                            }
                         }
                         .frame(height: viewModel.pageHeight + 80)
                     }
                     .padding(.horizontal, 20)
                 }
             }
+            .navigationBarHidden(true)
         }
     }
 }
 
-#Preview {
-    MovieListView()
+// MARK: - iOS 14 Preview
+struct MovieListView_Previews: PreviewProvider {
+    static var previews: some View {
+        MovieListView()
+            .preferredColorScheme(.dark)
+    }
 }

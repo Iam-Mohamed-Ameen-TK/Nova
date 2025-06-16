@@ -10,7 +10,7 @@ import SDWebImageSwiftUI
 
 struct MovieDetailView: View {
     @ObservedObject var viewModel: MovieDetailViewModel
-    @Environment(\.dismiss) private var dismiss
+    @Environment(\.presentationMode) private var presentationMode
 
     var body: some View {
         ZStack(alignment: .top) {
@@ -99,7 +99,7 @@ struct MovieDetailView: View {
     private var topBar: some View {
         HStack {
             Button(action: {
-                dismiss()
+                self.presentationMode.wrappedValue.dismiss()
             }) {
                 Image(systemName: "xmark.circle.fill")
                     .font(.system(size: 24))
